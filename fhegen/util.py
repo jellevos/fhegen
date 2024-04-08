@@ -1,7 +1,5 @@
 import math
-
-from sage.all import euler_phi
-from sage.all import Integer, Mod, Primes
+from sympy import n_order, nextprime, totient
 
 
 def clog2(x):
@@ -9,7 +7,9 @@ def clog2(x):
 
 
 def phi(x):
-    return euler_phi(x)
+    ans = totient.eval(x)
+    assert ans is not None
+    return ans
 
 
 def estsecurity(m, logq, sdist):
@@ -31,12 +31,11 @@ def estsecurity(m, logq, sdist):
 
 
 def genprime(start, m=0, batch=False):
-    P = Primes()
+    p = nextprime(start - 1)
 
-    p = P.next(Integer(start))
     if batch:
-        while p % m != 1:
-            p = P.next(p)
+        while p % m != 1:  # type: ignore
+            p = nextprime(p)
 
     return p
 
@@ -49,4 +48,4 @@ def gent(m, gen, t, logt, batch):
 
 
 def slots(m, t):
-    return euler_phi(m) / Mod(t, m).multiplicative_order()
+    return phi(m) / n_order(t, m)

@@ -4,3 +4,4 @@ main.cpp
 Makefile
 __pycache__/
 *.txt
+venv/

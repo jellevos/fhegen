@@ -1,4 +1,4 @@
-from sage.all import var
+from sympy import Interval, minimum, var
 import config
 import math
 import util
@@ -75,7 +75,9 @@ def _B(ops, Bargs, kswargs):
         'Model2': (sums**2 * Bconst**2 * (B + rots * Bswitch)**2 + Bswitch) / (B - fscale * Bscale),
         'OpenFHE': (sums * B**2 + (rots + 1) * Bswitch) / (B - fscale * Bscale)
     }[model]
-    return f.find_local_minimum(fscale * Bscale, 1 << config.BITS)[1]
+
+    ivl = Interval(fscale * Bscale, 1 << config.BITS)
+    return minimum(f, B, ivl)
 
 
 def _B0(ops, B, Bargs, kswargs, c=1):
