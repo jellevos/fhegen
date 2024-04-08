@@ -1,6 +1,7 @@
 [project]
 name = "fhegen"
 version = "0.1.0"
+description = "Parameter generation for FHE"
 
 [build-system]
 requires = ["flit_core >=2,<4"]
