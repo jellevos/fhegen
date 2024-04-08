@@ -1,11 +1,11 @@
 from sympy import Interval, minimum, var
-import config
+import fhegen.config
 import math
-import util
+import fhegen.util
 
 
 def _Bclean(m, t, D, Vs, Ve):
-    d = util.phi(m)
+    d = fhegen.util.phi(m)
     return D * t * math.sqrt(d * (1 / 12 + 2 * d * Vs * Ve + Ve))
 
 
@@ -13,26 +13,26 @@ def _Bconst(const, m, t, D, Vs, Ve):
     if not const:
         return 1
 
-    d = util.phi(m)
+    d = fhegen.util.phi(m)
     return D * t * math.sqrt(d / 12)
 
 
 def _Bscale(m, t, D, Vs, Ve):
-    d = util.phi(m)
+    d = fhegen.util.phi(m)
     return D * t * math.sqrt(d / 12 * (1 + d * Vs))
 
 
 def _Bswitch(m, t, D, Vs, Ve, method, L, beta, omega):
-    d = util.phi(m)
+    d = fhegen.util.phi(m)
     B = D * t * d * math.sqrt(Ve / 12)
 
     f0 = {
-        'BV': beta * math.sqrt(math.log(1 << (L * config.BITS), beta)),
-        'BV-RNS': beta * math.sqrt(L * math.log(1 << config.BITS, beta)),
-        'GHS': 1 / config.K,
-        'GHS-RNS': math.sqrt(L) / pow(config.K, L),
-        'Hybrid': math.sqrt(math.log(1 << (L * config.BITS), beta)) / config.K,
-        'Hybrid-RNS': math.sqrt(omega * L) / pow(config.K, L)
+        'BV': beta * math.sqrt(math.log(1 << (L * fhegen.config.BITS), beta)),
+        'BV-RNS': beta * math.sqrt(L * math.log(1 << fhegen.config.BITS, beta)),
+        'GHS': 1 / fhegen.config.K,
+        'GHS-RNS': math.sqrt(L) / pow(fhegen.config.K, L),
+        'Hybrid': math.sqrt(math.log(1 << (L * fhegen.config.BITS), beta)) / fhegen.config.K,
+        'Hybrid-RNS': math.sqrt(omega * L) / pow(fhegen.config.K, L)
     }[method]
     f1 = {
         'BV': 0,
@@ -76,7 +76,7 @@ def _B(ops, Bargs, kswargs):
         'OpenFHE': (sums * B**2 + (rots + 1) * Bswitch) / (B - fscale * Bscale)
     }[model]
 
-    ivl = Interval(fscale * Bscale, 1 << config.BITS)
+    ivl = Interval(fscale * Bscale, 1 << fhegen.config.BITS)
     return minimum(f, B, ivl)
 
 
@@ -98,21 +98,21 @@ def _B0(ops, B, Bargs, kswargs, c=1):
 
 
 def _logp0(B0):
-    return util.clog2(B0)
+    return fhegen.util.clog2(B0)
 
 
 def _logpi(B):
-    return util.clog2(B)
+    return fhegen.util.clog2(B)
 
 
 def _logpM(B, Bargs):
     Bclean = _Bclean(**Bargs)
     Bscale = _Bscale(**Bargs)
 
-    return util.clog2(Bclean / (B - Bscale))
+    return fhegen.util.clog2(Bclean / (B - Bscale))
 
 
-def _logP(logq, kswargs, K=config.K):
+def _logP(logq, kswargs, K=fhegen.config.K):
     method = kswargs['method']
     beta = kswargs['beta']
     omega = kswargs['omega']

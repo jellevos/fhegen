@@ -1,6 +1,6 @@
-import config
+import fhegen.config
 import math
-import util
+import fhegen.util
 
 
 def _f(x, sdist):
@@ -16,7 +16,7 @@ def _f(x, sdist):
 
 
 def _Vclean(m, t, D, Vs, Ve):
-    d = util.phi(m)
+    d = fhegen.util.phi(m)
     return t**2 * d * Ve * (Vs + Ve)
 
 
@@ -24,31 +24,31 @@ def _Vconst(const, m, t, D, Vs, Ve):
     if not const:
         return 1
 
-    d = util.phi(m)
+    d = fhegen.util.phi(m)
     return t**2 * d / 12
 
 
 def _Vmul(V, sdist, m, t, D, Vs, Ve):
-    d = util.phi(m)
+    d = fhegen.util.phi(m)
     return t**2 * d**2 * Vs / 6 * V * _f(2, sdist)
 
 
 def _Vscale(m, t, D, Vs, Ve):
-    d = util.phi(m)
+    d = fhegen.util.phi(m)
     return t**2 / 12 * (1 + d * Vs)
 
 
 def _Vswitch(m, t, D, Vs, Ve, method, L, beta, omega):
-    d = util.phi(m)
+    d = fhegen.util.phi(m)
     V = t**2 * d * Ve / 12
 
     f0 = {
-        'BV': beta**2 * math.log(1 << (L * config.BITS), beta),
-        'BV-RNS': beta**2 * L * math.log(1 << config.BITS, beta),
-        'GHS': 1 / config.K**2,
-        'GHS-RNS': L / pow(config.K, L**2),
-        'Hybrid': math.log(1 << (L * config.BITS), beta) / config.K**2,
-        'Hybrid-RNS': omega * L / pow(config.K, L**2)
+        'BV': beta**2 * math.log(1 << (L * fhegen.config.BITS), beta),
+        'BV-RNS': beta**2 * L * math.log(1 << fhegen.config.BITS, beta),
+        'GHS': 1 / fhegen.config.K**2,
+        'GHS-RNS': L / pow(fhegen.config.K, L**2),
+        'Hybrid': math.log(1 << (L * fhegen.config.BITS), beta) / fhegen.config.K**2,
+        'Hybrid-RNS': omega * L / pow(fhegen.config.K, L**2)
     }[method]
     f1 = {
         'BV': 0,
@@ -88,10 +88,10 @@ def _logq(ops, Bargs, kswargs, sdist):
         V = _Vlevel(V, ops, Bargs, kswargs, sdist)
         V = _Vmul(V, sdist, **Bargs) + _Vswitch(**Bargs, **kswargs)
 
-    return util.clog2(D * math.sqrt(8 * V))
+    return fhegen.util.clog2(D * math.sqrt(8 * V))
 
 
-def _logP(logq, kswargs, K=config.K):
+def _logP(logq, kswargs, K=fhegen.config.K):
     method = kswargs['method']
     beta = kswargs['beta']
     omega = kswargs['omega']

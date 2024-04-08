@@ -1,5 +1,4 @@
-import config
-import util
+import fhegen.config
 
 
 def openfhe(params):
@@ -15,7 +14,7 @@ def openfhe(params):
             f"\tparams.SetScalingModSize({params['qlbits']});\n"
             f"\tparams.SetBatchSize({params['slots']});\n"
             f"\tparams.SetScalingTechnique(FLEXIBLEAUTOEXT);\n\n"
-            f"\t// see {config.OPENFHE_LINK_BGV} for a full OpenFHE BGV example\n"
+            f"\t// see {fhegen.config.OPENFHE_LINK_BGV} for a full OpenFHE BGV example\n"
             f"\t// ...\n\n"))
     elif params['scheme'] == 'BFV':
         ctx = ((
@@ -28,7 +27,7 @@ def openfhe(params):
             f"\tparams.SetFirstModSize({params['q0bits']});\n"
             f"\tparams.SetScalingModSize({params['qlbits']});\n"
             f"\tparams.SetBatchSize({params['slots']});\n\n"
-            f"\t// see {config.OPENFHE_LINK_BFV} for a full OpenFHE BFV example\n"
+            f"\t// see {fhegen.config.OPENFHE_LINK_BFV} for a full OpenFHE BFV example\n"
             f"\t// ...\n\n"))
 
     with open("openfhe.cpp", "w+") as f:
@@ -50,7 +49,7 @@ def palisade(params):
             f"\t\t/* log2(pl)           */ {params['qlbits']},\n"
             f"\t\t/* batch size         */ {params['slots']},\n"
             f"\t\t/* modswitch method   */ AUTO);\n\n"
-            f"\t// see {config.PALISADE_LINK_BGV} for a full PALISADE BGV example\n"
+            f"\t// see {fhegen.config.PALISADE_LINK_BGV} for a full PALISADE BGV example\n"
             f"\t// ...\n\n"))
     elif params['scheme'] == 'BFV':
         ctx = ((
@@ -65,7 +64,7 @@ def palisade(params):
             f"\t\t/* maximum depth      */ 2,\n"
             f"\t\t/* log2(pi)           */ {params['qlbits']},\n"
             f"\t\t/* ring dimension     */ {params['d']});\n\n"
-            f"\t// see {config.PALISADE_LINK_BFV} for a full PALISADE BFV example\n"
+            f"\t// see {fhegen.config.PALISADE_LINK_BFV} for a full PALISADE BFV example\n"
             f"\t// ...\n\n"))
 
     with open("palisade.cpp", "w+") as f:
@@ -84,7 +83,7 @@ def seal(params):
             f"\tparams.set_poly_modulus_degree({params['d']});\n"
             f"\tparams.set_coeff_modulus({mvec});\n"
             f"\tparams.set_plain_modulus({params['t']});\n\n"
-            f"\t// see {config.SEAL_LINK_BGV} for a full SEAL BGV example\n"
+            f"\t// see {fhegen.config.SEAL_LINK_BGV} for a full SEAL BGV example\n"
             f"\t// ...\n\n"))
     elif params['scheme'] == 'BFV':
         ctx = ((
@@ -92,7 +91,7 @@ def seal(params):
             f"\tparams.set_poly_modulus_degree({params['d']});\n"
             f"\tparams.set_coeff_modulus({mvec});\n"
             f"\tparams.set_plain_modulus({params['t']});\n\n"
-            f"\t// see {config.SEAL_LINK_BGV} for a full SEAL BFV example\n"
+            f"\t// see {fhegen.config.SEAL_LINK_BGV} for a full SEAL BFV example\n"
             f"\t// ...\n\n"))
 
     with open("seal.cpp", "w+") as f:

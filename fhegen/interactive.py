@@ -1,8 +1,8 @@
-import bfv
-import bgv
-import codegen
+import fhegen.bfv
+import fhegen.bgv
+import fhegen.codegen
 import math
-import util
+import fhegen.util
 
 
 def pconfig(scheme, model, sec, m, t, logq, logP=None, lib=None):
@@ -10,7 +10,7 @@ def pconfig(scheme, model, sec, m, t, logq, logP=None, lib=None):
         f"\nGenerated your {scheme} configuration!\n"
         f"model: {model}\n"
         f"sec:   {sec}\n"
-        f"d:     {util.phi(m)}\n"
+        f"d:     {fhegen.util.phi(m)}\n"
         f"t:     {t}"))
 
     if len(logq) > 1:
@@ -21,7 +21,7 @@ def pconfig(scheme, model, sec, m, t, logq, logP=None, lib=None):
     if logP:
         print(f"Pbits: {logP}")
     if lib:
-        print(f"slots: {util.slots(m, t)}")
+        print(f"slots: {fhegen.util.slots(m, t)}")
 
 
 def doconst():
@@ -331,9 +331,9 @@ def main():
     welcome()
     schemename = getscheme()
     if schemename == 'BGV':
-        scheme = bgv
+        scheme = fhegen.bgv
     elif schemename == 'BFV':
-        scheme = bfv
+        scheme = fhegen.bfv
     model = getmodel()
 
     t, logt = gett()
@@ -381,7 +381,7 @@ def main():
     gent = False
     if not t:
         gent = True
-        t = util.gent(m, gent, t, logt, batch)
+        t = fhegen.util.gent(m, gent, t, logt, batch)
 
     ops = {'model': model, 'muls': muls, 'const': const, 'rots': rots, 'sums': sums}
     targs = {'gen': gent, 't': t, 'logt': logt, 'batch': batch}
@@ -395,20 +395,20 @@ def main():
         while True:
             logq, logP = scheme.logqP(ops, Bargs, kswargs, sdist)
             log = sum(logq) + logP if logP else sum(logq)
-            if logP and util.estsecurity(m, log, sdist) > sec:
+            if logP and fhegen.util.estsecurity(m, log, sdist) > sec:
                 break
 
             m <<= 1
             Bargs['m'] = m
 
             if gent:
-                t = util.gent(m, **targs)
+                t = fhegen.util.gent(m, **targs)
             targs['t'] = t
             Bargs['t'] = t
     else:
         logq, logP = scheme.logqP(ops, Bargs, kswargs, sdist)
 
-    sec = util.estsecurity(m, sum(logq) + logP, sdist)
+    sec = fhegen.util.estsecurity(m, sum(logq) + logP, sdist)
     pconfig(schemename, model, sec, m, t, logq, logP, lib)
 
     if lib == 'OpenFHE':
@@ -420,15 +420,15 @@ def main():
             qlbits = math.ceil(logq[0] / muls)
 
         writelib(lib)
-        codegen.openfhe({
+        fhegen.codegen.openfhe({
             'scheme': schemename,
-            'd': util.phi(m),
+            'd': fhegen.util.phi(m),
             't': t,
             'sdist': {'Ternary': 'UNIFORM_TERNARY', 'Error': 'GAUSSIAN'}[sdist],
             'depth': muls + 1,
             'q0bits': q0bits,
             'qlbits': qlbits,
-            'slots': util.slots(m, t),
+            'slots': fhegen.util.slots(m, t),
         })
     if lib == 'PALISADE':
         if schemename == 'BGV':
@@ -439,16 +439,16 @@ def main():
             qlbits = math.ceil(logq[0] / muls)
 
         writelib(lib)
-        codegen.palisade({
+        fhegen.codegen.palisade({
             'scheme': schemename,
             'sigma': sigma,
-            'd': util.phi(m),
+            'd': fhegen.util.phi(m),
             't': t,
             'sdist': {'Ternary': 'OPTIMIZED', 'Error': 'RLWE'}[sdist],
             'depth': muls + 1,
             'q0bits': q0bits,
             'qlbits': qlbits,
-            'slots': util.slots(m, t),
+            'slots': fhegen.util.slots(m, t),
             'rots': rots,
             'sums': sums,
         })
@@ -464,10 +464,10 @@ def main():
         q = []
         for i in range(muls):
             if i == 0:
-                q.append(util.genprime(1 << q0bits, m, batch))
+                q.append(fhegen.util.genprime(1 << q0bits, m, batch))
             if i == 1:
                 start = q[-1] if q0bits == qlbits else 1 << qlbits
-                q.append(util.genprime(start, m, batch))
+                q.append(fhegen.util.genprime(start, m, batch))
 
         if schemename == 'BGV':
             if qMbits == qlbits:
@@ -476,12 +476,12 @@ def main():
                 start = q[0]
             else:
                 start = 1 << qMbits
-            q.append(util.genprime(start, m, batch))
+            q.append(fhegen.util.genprime(start, m, batch))
 
         writelib(lib)
-        codegen.seal({
+        fhegen.codegen.seal({
             'scheme': schemename,
-            'd': util.phi(m),
+            'd': fhegen.util.phi(m),
             'q': q,
             't': t,
         })
