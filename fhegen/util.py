@@ -6,10 +6,9 @@ def clog2(x):
     return int(math.ceil(math.log2(x)))
 
 
-def phi(x):
-    ans = totient.eval(x)
-    assert ans is not None
-    return ans
+def phi(x) -> int:
+    ans = totient(x)
+    return ans  # type: ignore
 
 
 def estsecurity(m, logq, sdist):
