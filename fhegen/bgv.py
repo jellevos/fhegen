@@ -1,4 +1,4 @@
-from sympy import Interval, minimum, var
+from sympy import Interval, minimum, stationary_points, var
 import fhegen.config
 import math
 import fhegen.util
@@ -77,7 +77,16 @@ def _B(ops, Bargs, kswargs):
     }[model]
 
     ivl = Interval(fscale * Bscale, 1 << fhegen.config.BITS)
-    return minimum(f, B, ivl)
+    stationary = stationary_points(f, B, ivl)
+    lowest = None
+    lowest_cost = None
+    for point in stationary:
+        cost = f(point)
+        if lowest is None or cost < lowest_cost:
+            lowest = point
+            lowest_cost = cost
+    
+    return lowest
 
 
 def _B0(ops, B, Bargs, kswargs, c=1):
