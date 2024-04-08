@@ -81,7 +81,7 @@ def _B(ops, Bargs, kswargs):
     lowest = None
     lowest_cost = None
     for point in stationary:
-        cost = f(point)
+        cost = f.subs((B, point))
         if lowest is None or cost < lowest_cost:
             lowest = point
             lowest_cost = cost
